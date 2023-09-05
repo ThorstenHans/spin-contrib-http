@@ -6,28 +6,29 @@ const CONTENT_TYPE_JSON: &str = "application/json";
 
 /// Returns a `Result<spin_sdk::http::Response>` representing a 500 Internal Server Error
 /// with the provided error message
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `err` - The error message that should be returned in the HTTP response body
 /// * `content_type` - The content type of the HTTP response body (Optional) (defaults to `application/json`)
-/// 
+///
 /// # Example
 /// ```rust
 /// use anyhow::Result;
 /// use spin_sdk::{
 ///  http::{Request, Response},
-///  http_component,
 /// };  
 /// use spin_contrib_http::response::internal_server_error;
-/// 
-/// // #[http_component]
-/// pub fn handler(req: Request) -> Result<Response> {
+///
+/// fn handler(req: Request) -> Result<Response> {
 ///    let err = Some("Something went wrong".into());
 ///    internal_server_error(err, None)
 /// }
 /// ```
-pub fn internal_server_error(body: Option<bytes::Bytes>, content_type: Option<&str>) -> Result<Response> {
+pub fn internal_server_error(
+    body: Option<bytes::Bytes>,
+    content_type: Option<&str>,
+) -> Result<Response> {
     let content_type = content_type.unwrap_or(CONTENT_TYPE_JSON);
     Ok(http::Response::builder()
         .status(http::StatusCode::INTERNAL_SERVER_ERROR)
@@ -37,22 +38,20 @@ pub fn internal_server_error(body: Option<bytes::Bytes>, content_type: Option<&s
 
 /// Returns a `Result<spin_sdk::http::Response>` representing a redirect to the provided URL
 /// with the provided status code and Location header
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `url` - The URL to redirect to
 /// * `permanent` - Whether or not the redirect should be permanent
-/// 
+///
 /// # Example
 /// ```rust
 /// use anyhow::Result;
 /// use spin_sdk::{
 ///  http::{Request, Response},
-///  http_component,
 /// };  
 /// use spin_contrib_http::response::redirect;
-/// 
-/// // #[http_component]
+///
 /// pub fn handler(req: Request) -> Result<Response> {
 ///   let target = "https://example.com";
 ///   let permanent = false;
@@ -71,17 +70,15 @@ pub fn redirect(url: &str, permanent: bool) -> Result<Response> {
 }
 
 /// Returns a `Result<spin_sdk::http::Response>` representing a 405 Method Not Allowed
-/// 
+///
 /// # Example
 /// ```rust
 /// use anyhow::Result;
 /// use spin_sdk::{
 ///  http::{Request, Response},
-///  http_component,
 /// };  
 /// use spin_contrib_http::response::method_not_allowed;
-/// 
-/// // #[http_component]
+///
 /// pub fn handler(req: Request) -> Result<Response> {
 ///   method_not_allowed()
 /// }
@@ -91,17 +88,15 @@ pub fn method_not_allowed() -> Result<Response> {
 }
 
 /// Returns a `Result<spin_sdk::http::Response>` representing a 400 Bad Request
-/// 
+///
 /// # Example
 /// ```rust
 /// use anyhow::Result;
 /// use spin_sdk::{
 ///  http::{Request, Response},
-///  http_component,
 /// };
 /// use spin_contrib_http::response::bad_request;  
-/// 
-/// //#[http_component]
+///
 /// pub fn handler(req: Request) -> Result<Response> {
 ///   bad_request()
 /// }
@@ -111,17 +106,15 @@ pub fn bad_request() -> Result<Response> {
 }
 
 /// Returns a `Result<spin_sdk::http::Response>` representing a 404 Not Found
-/// 
+///
 /// # Example
 /// ```rust
 /// use anyhow::Result;
 /// use spin_sdk::{
 ///  http::{Request, Response},
-///  http_component,
 /// };  
 /// use spin_contrib_http::response::not_found;
-/// 
-/// // #[http_component]
+///
 /// pub fn handler(req: Request) -> Result<Response> {
 ///  not_found()
 /// }
@@ -131,17 +124,15 @@ pub fn not_found() -> Result<Response> {
 }
 
 /// Returns a `Result<spin_sdk::http::Response>` representing a 204 No Content
-/// 
+///
 /// # Example
 /// ```rust
 /// use anyhow::Result;
 /// use spin_sdk::{
 ///  http::{Request, Response},
-///  http_component,
 /// };  
 /// use spin_contrib_http::response::no_content;
-/// 
-/// // #[http_component]
+///
 /// pub fn handler(req: Request) -> Result<Response> {
 ///  no_content()
 /// }
@@ -151,21 +142,19 @@ pub fn no_content() -> Result<Response> {
 }
 
 /// Returns a `Result<spin_sdk::http::Response>` with desired status code
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `code` - The desired status code
-/// 
+///
 /// # Example
 /// ```rust
 /// use anyhow::Result;
 /// use spin_sdk::{
 ///  http::{Request, Response},
-///  http_component,
 /// };  
 /// use spin_contrib_http::response::status_code;
-/// 
-/// // #[http_component]
+///
 /// pub fn handler(req: Request) -> Result<Response> {
 ///   status_code(http::StatusCode::OK)
 /// }
@@ -225,10 +214,9 @@ mod tests {
     fn internal_server_error_should_set_error_message_as_body() {
         let err = String::from("{ \"error\": \"some err\" }");
         let sut = internal_server_error(Some(err.into()), None).unwrap();
-        let body = sut.body().as_ref().unwrap(); 
+        let body = sut.body().as_ref().unwrap();
         let actual = std::str::from_utf8(&body[..]).unwrap();
         assert_eq!(actual, "{ \"error\": \"some err\" }");
-        
     }
 
     #[test]

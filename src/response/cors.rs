@@ -74,15 +74,13 @@ pub const NO_ORIGINS: &str = "NULL";
 /// use anyhow::Result;
 /// use spin_sdk::{
 ///  http::{Request, Response},
-///  http_component,
 /// };  
 /// use spin_contrib_http::response::cors::{
-///     Config, 
+///     Config,
 ///     builder_with_cors,
 ///     ALL_METHODS, ALL_HEADERS,
 /// };
-/// 
-/// // #[http_component]
+///
 /// fn handler(req: Request) -> Result<Response> {
 ///     let cfg = Config {
 ///         allowed_origins: "https://example.com".into(),
@@ -136,10 +134,8 @@ pub fn builder_with_cors(cors_config: Config) -> Builder {
 /// use anyhow::Result;
 /// use spin_sdk::{
 ///  http::{Request, Response},
-///  http_component,
-/// }; 
+/// };
 /// use spin_contrib_http::response::{no_content,cors::{Config, handle_preflight}};
-/// // #[http_component]
 /// pub fn handler(req: Request) -> Result<Response> {
 ///   let cors_config = Config {
 ///     allowed_origins: "https://example.com".into(),
