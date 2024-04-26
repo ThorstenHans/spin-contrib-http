@@ -151,17 +151,18 @@ pub fn builder_with_cors(cors_config: Config) -> Builder {
 /// }
 /// ```
 pub fn handle_preflight(req: &Request, cors_config: Config) -> Result<Response> {
-    if !req.headers().contains_key(http::header::ORIGIN)
-        || !req
-            .headers()
-            .contains_key(http::header::ACCESS_CONTROL_REQUEST_METHOD)
-    {
+    let origin_header = req.header(http::header::ORIGIN.as_str());
+    let access_control_req_method_header =
+        req.header(http::header::ACCESS_CONTROL_REQUEST_METHOD.as_str());
+
+    if origin_header.is_none() || access_control_req_method_header.is_none() {
         return no_content();
     }
-    let Ok(origin) = req.headers().get(http::header::ORIGIN).unwrap().to_str() else {
+
+    let Some(origin) = origin_header.unwrap().as_str() else {
         return no_content();
     };
-    let Ok(method) = req.headers().get(http::header::ACCESS_CONTROL_REQUEST_METHOD).unwrap().to_str() else {
+    let Some(method) = access_control_req_method_header.unwrap().as_str() else {
         return no_content();
     };
 
@@ -169,25 +170,36 @@ pub fn handle_preflight(req: &Request, cors_config: Config) -> Result<Response> 
         return no_content();
     }
     if cors_config.is_origin_allowed(origin) && cors_config.is_method_allowed(method) {
-        let mut builder = http::Response::builder()
-            .header(http::header::ACCESS_CONTROL_ALLOW_ORIGIN, origin)
-            .header(http::header::ACCESS_CONTROL_ALLOW_METHODS, method)
-            .header(
-                http::header::ACCESS_CONTROL_ALLOW_HEADERS,
-                cors_config.allowed_headers.as_str(),
-            )
-            .header(
-                http::header::ACCESS_CONTROL_ALLOW_CREDENTIALS,
+        let mut headers: Vec<(String, String)> = vec![
+            (
+                http::header::ACCESS_CONTROL_ALLOW_ORIGIN.to_string(),
+                origin.to_string(),
+            ),
+            (
+                http::header::ACCESS_CONTROL_ALLOW_METHODS.to_string(),
+                method.to_string(),
+            ),
+            (
+                http::header::ACCESS_CONTROL_ALLOW_HEADERS.to_string(),
+                cors_config.allowed_headers,
+            ),
+            (
+                http::header::ACCESS_CONTROL_ALLOW_CREDENTIALS.to_string(),
                 format!("{}", cors_config.allow_credentials),
-            );
-
+            ),
+        ];
         if cors_config.max_age.is_some() {
-            builder = builder.header(
-                http::header::ACCESS_CONTROL_MAX_AGE,
+            headers.push((
+                http::header::ACCESS_CONTROL_MAX_AGE.to_string(),
                 format!("{}", cors_config.max_age.unwrap()),
-            );
+            ));
         }
-        return Ok(builder.status(http::StatusCode::NO_CONTENT).body(None)?);
+
+        return Ok(Response::builder()
+            .status(http::StatusCode::NO_CONTENT.as_u16())
+            .headers(headers)
+            .body(())
+            .build());
     }
     no_content()
 }

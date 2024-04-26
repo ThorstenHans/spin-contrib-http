@@ -17,8 +17,8 @@ name = "spin_contrib_http"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-http = "0.2"
 anyhow = "1"
 bytes = "1"
-spin-sdk = { git = "https://github.com/fermyon/spin", tag = "v1.4.1" }
+http = "1.1.0"
 quote = "1.0"
+spin-sdk = "3.0.1"
