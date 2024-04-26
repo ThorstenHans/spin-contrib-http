@@ -6,15 +6,12 @@ authors = ["Thorsten Hans <thorsten.hans@gmail.com>"]
 repository = "https://github.com/ThorstenHans/spin-contrib-http"
 homepage = "https://github.com/ThorstenHans/spin-contrib-http"
 license = "MIT"
-license_file = "LICENSE.txt"
 keywords = ["spin", "wasm", "wasi", "webassembly"]
 readme = "README.md"
 edition = "2021"
 
 [lib]
 name = "spin_contrib_http"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1"

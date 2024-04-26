@@ -4,6 +4,10 @@
 #![warn(rust_2021_compatibility)]
 #![warn(missing_docs)]
 
+/// Helpers to simplify working with cookies
+pub mod cookies;
+/// Helpers to simplify working with Cross-Origin Resource Sharing (CORS)
+pub mod cors;
 /// Extensions for working with HTTP requests
 pub mod request;
 /// Extensions for working with HTTP responses
