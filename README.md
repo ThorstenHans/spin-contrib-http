@@ -1,3 +1,8 @@
-# `spin-contrib-http` - A set of helpers to build HTTP-based apps with Fermyon Spin
+# Helpers for building HTTP-APIs with Fermyon Spin
 
-This crate contains a bunch of helpers to build HTTP-based applications with [Fermyon Spin](https://developer.fermyon.com/spin/index).
+This crate contributes the following capabilities to the [Spin SDK for Rust](https://crates.io/crates/spin-sdk):
+
+- Creating cookies
+- Cross-Origin Resource-Sharing (CORS)
+- Response helpers to produce common HTTP responses
+- Request helpers to examine incoming HTTP requests
