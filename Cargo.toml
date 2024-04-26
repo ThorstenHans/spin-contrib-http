@@ -15,7 +15,5 @@ name = "spin_contrib_http"
 
 [dependencies]
 anyhow = "1"
-bytes = "1"
 http = "1.1.0"
-quote = "1.0"
 spin-sdk = "3.0.1"

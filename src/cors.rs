@@ -1,4 +1,5 @@
 use spin_sdk::http::{Params, Request, Response, ResponseBuilder, Router};
+
 /// This struct is used to configure CORS support
 pub struct CorsConfig {
     /// The origins to allow in CORS (separated by commas)
@@ -109,7 +110,6 @@ impl CorsRouter for Router {
         self.options(
             "/*",
             move |req: Request, _: Params| -> anyhow::Result<Response> {
-                println!("Checking headers on req");
                 let origin_header = req.header(http::header::ORIGIN.as_str());
                 let access_control_req_method_header =
                     req.header(http::header::ACCESS_CONTROL_REQUEST_METHOD.as_str());
@@ -153,7 +153,6 @@ impl CorsRouter for Router {
                             format!("{}", cors_config.max_age.unwrap()),
                         ));
                     }
-
                     return Ok(Response::builder()
                         .status(http::StatusCode::NO_CONTENT.as_u16())
                         .headers(headers)

@@ -58,7 +58,6 @@ mod tests {
         let segments = req.get_route_segments();
         assert_eq!(segments.is_some(), true);
         let segments = segments.unwrap();
-        println!("{:?}", segments);
         assert_eq!(segments.len(), 3);
         assert_eq!(segments[0], "foo");
         assert_eq!(segments[1], "bar");
