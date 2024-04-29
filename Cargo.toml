@@ -1,6 +1,6 @@
 [package]
 name = "spin-contrib-http"
-version = "0.0.4"
+version = "0.0.5"
 description = "Bunch of helpers for building HTTP services using Fermyon Spin"
 authors = ["Thorsten Hans <thorsten.hans@gmail.com>"]
 repository = "https://github.com/ThorstenHans/spin-contrib-http"
