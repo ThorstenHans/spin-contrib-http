@@ -1,4 +1,4 @@
-use spin_sdk::http::Request;
+use spin_sdk::http::{Method, Request};
 
 const HEADER_SPIN_PATH_INFO: &str = "spin-path-info";
 
@@ -27,6 +27,9 @@ pub trait Contrib {
     /// assert_eq!(segments[2], "baz");
     /// ```
     fn get_route_segments(&self) -> Option<Vec<&str>>;
+
+    /// Determines if the request is a preflight request
+    fn is_preflight_request(&self) -> bool;
 }
 
 impl Contrib for Request {
@@ -41,17 +44,21 @@ impl Contrib for Request {
         segments.remove(0);
         Some(segments)
     }
+
+    fn is_preflight_request(&self) -> bool {
+        self.method() == &Method::Options && self.header(http::header::ORIGIN.as_str()).is_some()
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use spin_sdk::http::RequestBuilder;
+    use spin_sdk::http::{Method, RequestBuilder};
 
     use super::*;
 
     #[test]
     fn get_route_segments_should_return_provided_segments() {
-        let req = RequestBuilder::new(spin_sdk::http::Method::Get, "http::/foo.bar")
+        let req = RequestBuilder::new(Method::Get, "http://foo.bar")
             .header(HEADER_SPIN_PATH_INFO, "/foo/bar/baz")
             .body(())
             .build();
