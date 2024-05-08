@@ -1,23 +1,33 @@
-use spin_sdk::http::{Request, Response, ResponseBuilder};
+use spin_sdk::http::{Method, Response, ResponseBuilder};
 
 use super::{build_cors_headers, CorsConfig};
 
 /// Trait to add CORS capabilities
 pub trait CorsResponseBuilder {
     /// Build an HTTP response with CORS headers
-    fn build_with_cors(&mut self, req: &Request, cors_config: &CorsConfig) -> Response;
+    fn build_with_cors(
+        &mut self,
+        request_method: &Method,
+        request_origin: String,
+        cors_config: &CorsConfig,
+    ) -> Response;
 }
 
 impl CorsResponseBuilder for ResponseBuilder {
-    fn build_with_cors(&mut self, req: &Request, cors_config: &CorsConfig) -> Response {
-        let headers = build_cors_headers(req, cors_config);
+    fn build_with_cors(
+        &mut self,
+        request_method: &Method,
+        request_origin: String,
+        cors_config: &CorsConfig,
+    ) -> Response {
+        let headers = build_cors_headers(request_method, request_origin, cors_config);
         self.headers(headers).build()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use spin_sdk::http::{Method, RequestBuilder, ResponseBuilder};
+    use spin_sdk::http::{HeaderValue, Method, RequestBuilder, ResponseBuilder};
 
     use crate::cors::{CorsConfig, CorsResponseBuilder, ALL_HEADERS, ALL_METHODS, ALL_ORIGINS};
 
@@ -41,7 +51,13 @@ mod tests {
                 allow_credentials: true,
                 max_age: None,
             };
-            let sut = ResponseBuilder::new(200).build_with_cors(&req, &cfg);
+            let request_origin = req
+                .header(http::header::ORIGIN.as_str())
+                .unwrap_or(&HeaderValue::string(String::default()))
+                .as_str()
+                .unwrap()
+                .to_string();
+            let sut = ResponseBuilder::new(200).build_with_cors(req.method(), request_origin, &cfg);
 
             let vary_header = sut.header(http::header::VARY.as_str());
             assert_eq!(vary_header.is_some(), true);
@@ -64,7 +80,13 @@ mod tests {
             max_age: None,
         };
 
-        let sut = ResponseBuilder::new(200).build_with_cors(&req, &cfg);
+        let request_origin = req
+            .header(http::header::ORIGIN.as_str())
+            .unwrap_or(&HeaderValue::string(String::default()))
+            .as_str()
+            .unwrap()
+            .to_string();
+        let sut = ResponseBuilder::new(200).build_with_cors(req.method(), request_origin, &cfg);
 
         let vary_header = sut.header(http::header::VARY.as_str());
         assert_eq!(vary_header.is_none(), true);
@@ -87,7 +109,13 @@ mod tests {
             allow_credentials: true,
             max_age: None,
         };
-        let sut = ResponseBuilder::new(200).build_with_cors(&req, &cfg);
+        let request_origin = req
+            .header(http::header::ORIGIN.as_str())
+            .unwrap_or(&HeaderValue::string(String::default()))
+            .as_str()
+            .unwrap()
+            .to_string();
+        let sut = ResponseBuilder::new(200).build_with_cors(req.method(), request_origin, &cfg);
 
         let actual = sut
             .header(http::header::ACCESS_CONTROL_ALLOW_ORIGIN.as_str())
@@ -114,7 +142,13 @@ mod tests {
             allow_credentials: true,
             max_age: None,
         };
-        let sut = ResponseBuilder::new(200).build_with_cors(&req, &cfg);
+        let request_origin = req
+            .header(http::header::ORIGIN.as_str())
+            .unwrap_or(&HeaderValue::string(String::default()))
+            .as_str()
+            .unwrap()
+            .to_string();
+        let sut = ResponseBuilder::new(200).build_with_cors(req.method(), request_origin, &cfg);
         assert_eq!(
             sut.header(http::header::ACCESS_CONTROL_ALLOW_ORIGIN.as_str())
                 .is_none(),
@@ -143,9 +177,16 @@ mod tests {
             )
             .build();
 
-        let sut = ResponseBuilder::new(200)
-            .body(())
-            .build_with_cors(&req, &cfg);
+        let request_origin = req
+            .header(http::header::ORIGIN.as_str())
+            .unwrap_or(&HeaderValue::string(String::default()))
+            .as_str()
+            .unwrap()
+            .to_string();
+        let sut =
+            ResponseBuilder::new(200)
+                .body(())
+                .build_with_cors(req.method(), request_origin, &cfg);
 
         assert_eq!(
             sut.header(http::header::ACCESS_CONTROL_ALLOW_ORIGIN.as_str())
@@ -170,7 +211,13 @@ mod tests {
             true,
             Some(300),
         );
-        let sut = ResponseBuilder::new(200).build_with_cors(&req, &cfg);
+        let request_origin = req
+            .header(http::header::ORIGIN.as_str())
+            .unwrap_or(&HeaderValue::string(String::default()))
+            .as_str()
+            .unwrap()
+            .to_string();
+        let sut = ResponseBuilder::new(200).build_with_cors(req.method(), request_origin, &cfg);
 
         assert_eq!(
             sut.header(http::header::ACCESS_CONTROL_ALLOW_ORIGIN.as_str())

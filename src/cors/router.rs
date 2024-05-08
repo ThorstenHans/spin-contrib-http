@@ -47,7 +47,7 @@ fn options_handler(req: &Request, cors_config: &CorsConfig) -> anyhow::Result<Re
     {
         return Ok(Response::new(405, ()));
     }
-    let headers = build_cors_headers(req, cors_config);
+    let headers = build_cors_headers(req.method(), req_origin, cors_config);
     Ok(ResponseBuilder::new(http::StatusCode::NO_CONTENT)
         .headers(headers)
         .body(())
