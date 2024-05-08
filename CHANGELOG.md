@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.7](https://github.com/ThorstenHans/spin-contrib-http/compare/v0.0.6...v0.0.7) - 2024-05-08
+
+### Added
+- Add get_header_value_as_string to Request (Contrib trait)
+
+### Other
+- Add sample to illustrate how one could use CORS
+- change signature of CorsRouter::register_options_handler to take a ref of CorsConfig
+- implement Clone trait for CorsConfig
+
 ## [0.0.6](https://github.com/ThorstenHans/spin-contrib-http/compare/v0.0.5...v0.0.6) - 2024-05-08
 
 ### Added
