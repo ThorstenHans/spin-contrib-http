@@ -38,6 +38,18 @@ impl CorsConfig {
     }
 }
 
+impl Clone for CorsConfig {
+    fn clone(&self) -> Self {
+        Self {
+            allowed_origins: self.allowed_origins.clone(),
+            allowed_methods: self.allowed_methods.clone(),
+            allowed_headers: self.allowed_headers.clone(),
+            allow_credentials: self.allow_credentials,
+            max_age: self.max_age,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
