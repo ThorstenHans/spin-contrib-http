@@ -1,4 +1,4 @@
-use spin_sdk::http::{Method, Request};
+use spin_sdk::http::{HeaderValue, Method, Request};
 
 const HEADER_SPIN_PATH_INFO: &str = "spin-path-info";
 
@@ -30,6 +30,9 @@ pub trait Contrib {
 
     /// Determines if the request is a preflight request
     fn is_preflight_request(&self) -> bool;
+
+    /// Returns a header value as String. If header is not present or value is empty, an empty string is returned
+    fn get_header_value_as_string(&self, header_name: &str) -> String;
 }
 
 impl Contrib for Request {
@@ -47,6 +50,14 @@ impl Contrib for Request {
 
     fn is_preflight_request(&self) -> bool {
         self.method() == &Method::Options && self.header(http::header::ORIGIN.as_str()).is_some()
+    }
+
+    fn get_header_value_as_string(&self, header_name: &str) -> String {
+        self.header(header_name)
+            .unwrap_or(&HeaderValue::string(String::default()))
+            .as_str()
+            .unwrap()
+            .to_string()
     }
 }
 
@@ -81,6 +92,24 @@ mod tests {
                 .build();
 
             assert_eq!(req.get_route_segments(), None);
+        }
+    }
+
+    #[test]
+    fn get_header_value_as_string_should_return_correct_values() {
+        let test_data = vec![
+            ("my-header", "foo", "my-header", "foo"),
+            ("my-header", "", "my-header", ""),
+            ("my-header", "foo", "my-other-header", ""),
+            ("my-header", "", "my-other-header", ""),
+        ];
+        for data in test_data {
+            let req = RequestBuilder::new(spin_sdk::http::Method::Get, "http://foo.bar")
+                .header(data.0, data.1)
+                .body(())
+                .build();
+
+            assert_eq!(req.get_header_value_as_string(data.2), data.3);
         }
     }
 }
