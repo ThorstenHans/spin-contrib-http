@@ -1,0 +1,18 @@
+spin_manifest_version = 2
+
+[application]
+name = "usage"
+version = "0.1.0"
+authors = ["Thorsten Hans <thorsten.hans@fermyon.com>"]
+description = ""
+
+[[trigger.http]]
+route = "/..."
+component = "usage"
+
+[component.usage]
+source = "target/wasm32-wasi/release/usage.wasm"
+allowed_outbound_hosts = []
+[component.usage.build]
+command = "cargo build --target wasm32-wasi --release"
+watch = ["src/**/*.rs", "Cargo.toml"]

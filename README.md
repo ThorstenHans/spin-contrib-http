@@ -6,3 +6,7 @@ This crate contributes the following capabilities to the [Spin SDK for Rust](htt
 - Cross-Origin Resource-Sharing (CORS)
 - Response helpers to produce common HTTP responses
 - Request helpers to examine incoming HTTP requests
+
+## Examples
+
+Tale a look at the [`examples`](./examples/) folder.

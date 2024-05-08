@@ -9,7 +9,7 @@ license = "MIT"
 keywords = ["spin", "wasm", "wasi", "webassembly"]
 readme = "README.md"
 edition = "2021"
-
+exclude = ["examples/*"]
 [lib]
 name = "spin_contrib_http"
 
