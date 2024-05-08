@@ -1,6 +1,4 @@
-use spin_sdk::http::{HeaderValue, Request};
-
-use crate::request::Contrib;
+use spin_sdk::http::Method;
 
 use super::CorsConfig;
 
@@ -13,24 +11,26 @@ pub const ALL_ORIGINS: &str = "*";
 /// Constant for allowing no origins in CORS
 pub const NO_ORIGINS: &str = "null";
 
-pub(crate) fn build_cors_headers(req: &Request, cors_config: &CorsConfig) -> Vec<(String, String)> {
+fn is_preflight(m: &Method, origin: &str) -> bool {
+    m == &Method::Options && !origin.is_empty()
+}
+
+pub(crate) fn build_cors_headers(
+    request_method: &Method,
+    request_origin: String,
+    cors_config: &CorsConfig,
+) -> Vec<(String, String)> {
     let mut headers: Vec<(String, String)> = vec![];
 
-    if req.header(http::header::ORIGIN.as_str()).is_none() {
+    if request_origin.is_empty() {
         return headers;
     }
 
-    let requested_origin = req
-        .header(http::header::ORIGIN.as_str())
-        .unwrap_or(&HeaderValue::string(String::default()))
-        .as_str()
-        .unwrap_or("")
-        .to_string();
     // if origin is not allowed, return no cors headers
-    if is_origin_allowed(&cors_config.allowed_origins, &requested_origin) {
+    if is_origin_allowed(&cors_config.allowed_origins, &request_origin) {
         headers.push((
             http::header::ACCESS_CONTROL_ALLOW_ORIGIN.to_string(),
-            get_origin_header_value(&cors_config.allowed_origins, req),
+            get_origin_header_value(&cors_config.allowed_origins, &request_origin),
         ));
 
         headers.push((
@@ -43,7 +43,7 @@ pub(crate) fn build_cors_headers(req: &Request, cors_config: &CorsConfig) -> Vec
         headers.push((http::header::VARY.to_string(), "Origin".to_string()));
     }
 
-    if !req.is_preflight_request() {
+    if !is_preflight(request_method, &request_origin) {
         return headers;
     }
 
@@ -107,19 +107,12 @@ pub(crate) fn is_origin_allowed(allowed_origins: &str, origin: &str) -> bool {
     allowed_origins.contains(&origin.to_lowercase().trim())
 }
 
-pub(crate) fn get_origin_header_value(allowed_origins: &str, req: &Request) -> String {
-    let origin_request_header_value = req
-        .header(http::header::ORIGIN.as_str())
-        .unwrap_or(&HeaderValue::string(String::default()))
-        .as_str()
-        .unwrap()
-        .to_string();
-
+pub(crate) fn get_origin_header_value(allowed_origins: &str, request_origin: &str) -> String {
     if allowed_origins == ALL_ORIGINS {
-        return origin_request_header_value;
+        return request_origin.to_string();
     }
-    if allowed_origins.contains(&origin_request_header_value) {
-        return origin_request_header_value;
+    if allowed_origins.contains(request_origin) {
+        return request_origin.to_string();
     }
     NO_ORIGINS.to_string()
 }
