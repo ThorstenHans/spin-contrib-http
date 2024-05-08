@@ -5,15 +5,16 @@ use super::{build_cors_headers, is_method_allowed, CorsConfig, ALL_ORIGINS, NO_O
 /// Trait to add CORS capabilities to spin_sdk::http::Router
 pub trait CorsRouter {
     /// Register handler for CORS OPTIONS requests
-    fn register_options_handler(&mut self, cors_config: CorsConfig);
+    fn register_options_handler(&mut self, cors_config: &CorsConfig);
 }
 
 impl CorsRouter for Router {
-    fn register_options_handler(&mut self, cors_config: CorsConfig) {
+    fn register_options_handler(&mut self, cors_config: &CorsConfig) {
+        let cfg = cors_config.clone();
         self.options(
             "/*",
             move |req: Request, _: Params| -> anyhow::Result<Response> {
-                options_handler(&req, &cors_config)
+                options_handler(&req, &cfg)
             },
         )
     }
