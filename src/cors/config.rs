@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use super::NO_ORIGINS;
 
 /// This struct is used to configure CORS support
@@ -35,6 +37,18 @@ impl CorsConfig {
             allow_credentials,
             max_age,
         }
+    }
+}
+
+impl Debug for CorsConfig {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CorsConfig")
+            .field("allowed_origins", &self.allowed_origins)
+            .field("allowed_methods", &self.allowed_methods)
+            .field("allowed_headers", &self.allowed_headers)
+            .field("allow_credentials", &self.allow_credentials)
+            .field("max_age", &self.max_age)
+            .finish()
     }
 }
 
