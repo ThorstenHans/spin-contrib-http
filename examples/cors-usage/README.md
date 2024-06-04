@@ -20,7 +20,7 @@ You can use `curl` to send test requests to the app. Please keep in mind that CO
 
 Samples listed below construct resources based on the following `CorsConfig` instance:
 
-``rust
+```rust
     CorsConfig::new(
         ALL_ORIGINS.to_string(),
         ALL_METHODS.to_string(),

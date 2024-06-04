@@ -1,6 +1,6 @@
 use spin_sdk::http::{Method, Response, ResponseBuilder};
 
-use super::{build_cors_headers, CorsConfig};
+use super::{build_cors_headers, is_origin_allowed, CorsConfig, ALL_ORIGINS};
 
 /// Trait to add CORS capabilities
 pub trait CorsResponseBuilder {
@@ -20,6 +20,14 @@ impl CorsResponseBuilder for ResponseBuilder {
         request_origin: String,
         cors_config: &CorsConfig,
     ) -> Response {
+        if !request_origin.is_empty()
+            && cors_config.allowed_origins != ALL_ORIGINS
+            && !is_origin_allowed(&cors_config.allowed_origins, &request_origin)
+        {
+            self.status(403);
+            self.body(());
+        }
+
         let headers = build_cors_headers(request_method, request_origin, cors_config);
         self.headers(headers).build()
     }
